@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>我的作品集</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans TC', sans-serif;
+      background: #f5f5f5;
+      color: #1a1a1a;
+      min-height: 100vh;
+      scrollbar-gutter: stable;
+    }
+
+    header {
+      background: #ffffff;
+      border-bottom: 1px solid #e8e8e8;
+      padding: 24px 28px;
+    }
+
+    .header-inner {
+      max-width: 1080px;
+      margin: 0 0 0 48px;
+      display: flex;
+      align-items: center;
+      gap: 36px;
+    }
+
+    .header-avatar {
+      width: 90px;
+      height: auto;
+      border-radius: 10px;
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 3px solid #e8e8e8;
+      display: block;
+    }
+
+    .header-info {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .header-info h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: #111;
+    }
+
+    .header-edu {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .header-edu span {
+      font-size: 0.9rem;
+      color: #555;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-edu span::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #aaa;
+      flex-shrink: 0;
+    }
+
+    .header-divider {
+      width: 0;
+      align-self: stretch;
+      border-right: 1px solid #e0e0e0;
+      margin: 0 60px 0 90px;
+      flex-shrink: 0;
+    }
+
+    .header-details {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      position: relative;
+    }
+
+    .header-details::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 0;
+      border-right: 1px solid #e0e0e0;
+      left: var(--d3-left, -999px);
+    }
+
+    .header-contact {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .header-contact span {
+      font-size: 0.9rem;
+      color: #555;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-contact .contact-label {
+      flex-shrink: 0;
+      line-height: 0;
+    }
+
+    .header-skills {
+      position: absolute;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transform: translateX(-50%);
+    }
+
+    .header-skills span {
+      font-size: 0.9rem;
+      color: #555;
+      white-space: nowrap;
+    }
+
+    .header-contact .contact-label svg {
+      width: 14px;
+      height: 14px;
+      stroke: #666;
+      vertical-align: middle;
+    }
+
+    /* ── Tablet ── */
+    @media (max-width: 1280px) {
+      .header-inner { margin: 0 0 0 28px; }
+    }
+
+    main {
+      max-width: 1080px;
+      margin: 40px auto;
+      padding: 0 28px;
+    }
+
+    #portfolio-view {
+      position: relative;
+    }
+
+    .filter-bar {
+      position: absolute;
+      top: 0;
+    }
+
+    .filter-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 14px;
+      border-radius: 7px;
+      border: 1px solid #e0e0e0;
+      background: #fff;
+      color: #555;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      line-height: 1;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .filter-trigger:hover { border-color: #bbb; color: #333; }
+    .filter-trigger svg { flex-shrink: 0; }
+
+    .filter-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      padding: 5px;
+      z-index: 100;
+      min-width: 120px;
+    }
+    .filter-menu.open { display: block; }
+
+    .filter-option {
+      display: block;
+      width: 100%;
+      padding: 8px 12px;
+      border: none;
+      background: transparent;
+      color: #555;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      border-radius: 5px;
+      font-family: inherit;
+      line-height: 1;
+      transition: background 0.1s, color 0.1s;
+    }
+    .filter-option:hover { background: #f5f5f5; color: #222; }
+    .filter-option.active { color: #1a4ecb; font-weight: 700; }
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+
+    .card {
+      height: 300px;
+      background: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05);
+      overflow: hidden;
+      display: flex;
+      flex-direction: row;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+
+    .card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.11), 0 12px 32px rgba(0,0,0,0.07);
+      transform: translateY(-2px);
+    }
+
+    .card-left {
+      width: 42%;
+      flex-shrink: 0;
+      border-right: 1px solid #f0f0f0;
+      position: relative;
+    }
+    .card-left::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+    }
+
+    .card-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      background: #e8e8e8;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .card-img-placeholder {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #ebebeb 0%, #ddd 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #bbb;
+      font-size: 2rem;
+    }
+
+    .card-right {
+      flex: 1;
+      padding: 28px 36px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow: hidden;
+    }
+
+    .card-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #111;
+      line-height: 1;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-badge {
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 4px;
+      padding: 3px 11px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-left: auto;
+      margin-right: 10px;
+    }
+    .card-badge--blue {
+      color: #2563eb;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+    }
+    .card-badge--green {
+      color: #16a34a;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+    }
+    .card-badge--red {
+      color: #dc2626;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+    }
+
+    .card-desc {
+      font-size: 1.05rem;
+      color: #444;
+      line-height: 1.85;
+      text-align: justify;
+      overflow: hidden;
+      flex: 1;
+      margin-top: 14px;
+    }
+
+    .card-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      background: #1a4ecb;
+      color: #fff;
+      border-radius: 7px;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      line-height: 1;
+      white-space: nowrap;
+      flex-shrink: 0;
+      align-self: flex-end;
+      transition: background 0.15s;
+    }
+
+    .card-link:hover { background: #163faa; }
+
+    .card-link svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+
+    footer {
+      text-align: center;
+      padding: 56px 24px;
+      color: #bbb;
+      font-size: 0.82rem;
+    }
+
+    /* ── Compact Header：手機 + 平板（≤1279px 都走這個版型，避免橫向溢出） ── */
+    @media (max-width: 1279px) {
+      header { padding: 20px 20px; }
+
+      .header-inner {
+        position: relative;
+        align-items: flex-start;
+        margin: 0;
+        gap: 28px;
+      }
+
+      .header-avatar {
+        width: 136px;
+        height: 181px;
+        object-fit: cover;
+        object-position: top center;
+        border-radius: 10px;
+        flex-shrink: 0;
+      }
+
+      .header-info {
+        position: static;
+        flex: 1;
+        min-width: 0;
+        gap: 6px;
+      }
+
+      .header-info h1 { font-size: 1.05rem; line-height: 1.3; }
+
+      .header-details { position: static !important; flex-direction: column; gap: 0; }
+
+      .header-divider {
+        width: auto !important;
+        height: 0 !important;
+        border-right: none !important;
+        border-bottom: 1px solid #ebebeb !important;
+        margin: 8px 0 !important;
+        align-self: stretch;
+      }
+
+      .header-details::after { display: none !important; }
+
+      .header-edu { gap: 4px; }
+      .header-edu span { font-size: 0.8rem; gap: 6px; }
+      .header-edu span::before { width: 4px; height: 4px; }
+
+      .header-contact { gap: 4px; }
+      .header-contact span { font-size: 0.8rem; gap: 6px; }
+      .header-contact .contact-label svg { width: 13px; height: 13px; }
+
+      .header-skills {
+        position: static !important;
+        transform: none !important;
+        flex-direction: column !important;
+        gap: 3px !important;
+      }
+      .header-skills span { font-size: 0.8rem; }
+
+      .view-toggle-btn {
+        position: absolute !important;
+        top: 211px !important;
+        left: 68px !important;
+        right: auto !important;
+        transform: translateX(-50%) !important;
+        width: fit-content !important;
+        text-align: center;
+        padding: 6px 14px !important;
+        font-size: 0.75rem !important;
+      }
+
+      .filter-bar { position: static !important; margin: 20px 0 14px; }
+    }
+
+    /* ── 手機版卡片 / main ── */
+    @media (max-width: 768px) {
+      main { padding: 0 16px; margin: 16px auto; }
+
+      .bio-card { padding: 24px 18px; }
+      .bio-paragraphs p { font-size: 0.95rem; }
+
+      .card { height: auto; flex-direction: column; }
+      .card-left { width: 100%; height: 190px; border-right: none; border-bottom: 1px solid #f0f0f0; }
+      .card-right { padding: 18px; }
+      .card-title { font-size: 1.15rem; }
+      .card-desc { font-size: 0.92rem; margin-top: 6px; }
+      .card-badge { margin-right: 0; }
+    }
+
+    /* ── Very Small Mobile ── */
+    @media (max-width: 420px) {
+      .header-inner { gap: 20px; }
+      .header-avatar { width: 110px; height: 147px; }
+      .header-info h1 { font-size: 0.95rem; }
+      .view-toggle-btn { top: 177px !important; left: 55px !important; transform: translateX(-50%) !important; width: fit-content !important; padding: 6px 14px !important; }
+      main { padding: 0 12px; }
+    }
+
+    .view-toggle-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #9ca3af;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: 7px 18px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      line-height: 1;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: inherit;
+      transition: background 0.15s;
+    }
+    .view-toggle-btn:hover { background: #6b7280; }
+
+    .bio-card {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05);
+      padding: 48px 56px;
+    }
+    .bio-heading {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #111;
+      letter-spacing: -0.2px;
+      margin-bottom: 36px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #d8d8d8;
+    }
+    .bio-paragraphs {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+    .bio-paragraphs p {
+      font-size: 1.08rem;
+      color: #444;
+      line-height: 2;
+      text-align: justify;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <img class="header-avatar" src="個人資訊/頭貼.jpg" alt="Chuan-Feng Hsu">
+    <div class="header-info">
+      <h1>許銓丰 (Chuan-Feng Hsu)</h1>
+      <div class="header-details">
+        <div class="header-edu">
+          <span>私立揚子高級中學 畢業</span>
+          <span>國立中興大學資訊管理學系 畢業</span>
+          <span>國立成功大學資訊管理研究所 錄取</span>
+        </div>
+        <div class="header-divider"></div>
+        <div class="header-contact">
+          <span><span class="contact-label"><svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M5 1v4M11 1v4M2 7h12"/></svg></span>2003年10月2日</span>
+          <span><span class="contact-label"><svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 2h2l1 3-1.5 1.5a8 8 0 003.5 3.5L12 9l3 1v2a1 1 0 01-1 1C6.5 13 3 9.5 3 4a1 1 0 011-1z"/></svg></span>0907011986</span>
+          <span><span class="contact-label"><svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="12" height="9" rx="1.5"/><path d="M2 5l6 5 6-5"/></svg></span>iverson602031002@gmail.com</span>
+        </div>
+        <div class="header-divider" style="margin: 0 0 0 60px;"></div>
+        <div class="header-skills">
+          <span>Python、Java、SQL、n8n</span>
+          <span>網頁設計、物件辨識、資料處理</span>
+          <span>TOEIC 825分</span>
+        </div>
+        <button class="view-toggle-btn" id="view-toggle">查看自傳</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div id="portfolio-view">
+    <div class="filter-bar" id="filter-bar">
+      <button class="filter-trigger" id="filter-trigger">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h12M4 8h8M6 12h4"/></svg>
+        <span id="filter-label">全部</span>
+        <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>
+      </button>
+      <div class="filter-menu" id="filter-menu">
+        <button class="filter-option active" data-filter="all">全部</button>
+        <button class="filter-option" data-filter="課堂作品">課堂作品</button>
+        <button class="filter-option" data-filter="畢業專題">畢業專題</button>
+        <button class="filter-option" data-filter="工作專案">工作專案</button>
+      </div>
+    </div>
+    <div class="list" id="projects-grid">
+      <!-- 專案卡片由下方 JS 資料產生 -->
+    </div>
+  </div>
+  <div id="bio-view" style="display:none">
+    <div class="bio-card">
+      <h2 class="bio-heading">關於我</h2>
+      <div class="bio-paragraphs">
+        <p>我是許銓丰，畢業於中興大學資管系，並錄取了成功大學資管所，將於今年9月繼續攻讀碩士學位。在大學期間，我修習了多門核心課程，建立起資訊管理的專業基礎，同時激發了我對資訊領域的熱情與好奇心。而在解決專案中遇到的各種問題時，也讓我養成了主動學習與持續改進的習慣。</p>
+        <p>我擅長的程式語言有Python和Java，曾利用Python撰寫畢業專題並在競賽中獲得第三名，主要聚焦於人工智慧技術在軍事領域的應用，並針對無人機影像進行處理。我也使用過SQL、PHP、HTML，具有網頁前端設計與網站前後端串聯的實作經驗。工作經歷方面，我曾獨立開發一個聊天機器人專案，以n8n自動化工作流串接多項外部API，並進行AI整合，實現多人即時互動功能，最後也順利上線運行。</p>
+        <p>我認為自己是一個好奇心強、有責任感且善於團隊合作的人。面對困難與挑戰時，我會主動思考解決方法，並嘗試將成果做得更好，同時保持著高度的學習熱忱與積極態度。相信這些特質將有助於我在實習中持續學習與成長，並充分發揮自身能力，為團隊帶來貢獻。</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  &copy; Chuan-Feng Hsu · 個人作品集
+</footer>
+
+<script>
+  const projects = [
+    {
+      tag: "網頁設計",
+      title: "NBA球隊介紹網站",
+      badge: "課堂作品",
+      desc: "利用HTML5建置出一個介紹NBA球隊的網站，跳轉頁面後可查看每支球隊的詳細資訊，如：創隊年份、總冠軍數及主場館位置等，並結合嵌入式表單與廣告頁籤，提升使用者的互動體驗。此網站也採用了RWD（響應式網頁設計），以確保在不同裝置上皆能有良好的瀏覽效果。",
+      image: "NBA球隊介紹網站/NBA球隊介紹網站.webp",
+      link: ""
+    },
+    {
+      tag: "全端開發",
+      title: "學校管理系統",
+      badge: "課堂作品",
+      desc: "透過PHP與MySQL開發出一個學校管理系統，並搭配HTML及CSS設計前端介面，以有效管理學生、教師及課程等相關資訊。使用者（管理員）可以對學生及教師的資料進行增、刪、查、改等操作，系統使用Hash加密處理保護使用者資訊，並採用RWD（響應式網頁設計）提供良好的跨裝置使用體驗。",
+      image: "學校管理系統/學校管理系統.webp",
+      link: "https://drive.google.com/file/d/1O8B1x-xCpMjYCLbBG5cKsvJFaC5dijMG/view?usp=sharing"
+    },
+    {
+      tag: "網頁開發",
+      title: "籃球用品商場網站",
+      badge: "課堂作品",
+      desc: "利用Django開發出一個籃球用品商場網站，不同身分（顧客、商家與訪客）能享有的操作權限也不同。顧客可管理個人資訊、查詢購買紀錄及下訂單；商家擁有專屬後台管理商品與訂單。網站加入Captcha與CSRF保護機制提高安全性，並以JavaScript實現輪播圖、下拉式選單等動態效果。",
+      image: "籃球用品商場網站/籃球用品商場網站.webp",
+      link: "https://drive.google.com/file/d/1Hx7PWIV2cu9ocAWADkUdGW0BY_3dBMuJ/view"
+    },
+    {
+      tag: "資料科學",
+      title: "水質可飲用性預測",
+      badge: "課堂作品",
+      desc: "由於水資源污染問題日益嚴重，飲用不安全的水可能導致多種疾病，因此準確評估水質是保障健康的重要環節。本專案旨在透過資料科學與機器學習技術，建立一個能準確評估水質的預測模型，並找出影響水質的關鍵因素，促進安全飲水的普及。",
+      image: "水質可飲用性預測/水質可飲用性預測.webp",
+      link: "https://drive.google.com/file/d/1PnRn0ANtlOnzwAoYkakPp8hiS6hyjlWY/view?usp=sharing"
+    },
+    {
+      tag: "電腦視覺",
+      title: "無人機空拍影像移動物體識別",
+      badge: "畢業專題",
+      desc: "本研究針對無人機空拍影像中微小移動目標的偵測問題，提出一套基於RGB影像的物件識別方法。透過影像前置處理、光流運動分析及深度學習偵測模型的整合，採用兩階段優化策略，模型召回率從47.5%提升至65.7%，精確率從62.9%提升至83.8%，整體效能獲得大幅度改善。",
+      image: "無人機空拍影像移動物體識別/無人機空拍影像移動物體識別.webp",
+      link: "https://drive.google.com/file/d/1b5zyduFXig3WtOQR3rgcl7Hs2_kQ5FNH/view?usp=sharing"
+    },
+    {
+      tag: "全端開發",
+      title: "LINE 聊天機器人",
+      badge: "工作專案",
+      desc: "透過 n8n 自動化工作流串接多項外部 API 並整合 AI 服務，開發出一套具備 AI 功能的 LINE 聊天機器人，搭配 LIFF 技術建置配套前端網頁介面。使用者可獲得個人化星座占卜，並能隨時與機器人對話或上傳照片分析，同時也支援定時推播通知。此外，使用者還可以加入星際群組與好友互動，功能涵蓋多人即時對戰、排名統計與成員管理等，整個專案目前已成功部署上線。",
+      image: "Line 聊天機器人/Line 聊天機器人.png",
+      link: ""
+    }
+  ];
+
+  const grid = document.getElementById('projects-grid');
+
+  const arrowIcon = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 8h10M9 4l4 4-4 4"/>
+  </svg>`;
+
+  projects.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    const imgHtml = p.image
+      ? `<img class="card-img" src="${p.image}" alt="${p.title}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+        + `<div class="card-img-placeholder" style="display:none">📁</div>`
+      : `<div class="card-img-placeholder">📁</div>`;
+
+    const linkHtml = p.link
+      ? `<a class="card-link" href="${p.link}" target="_blank" rel="noopener">前往查看 ${arrowIcon}</a>`
+      : '';
+
+    const badgeColor = p.badge === '畢業專題' ? 'green' : p.badge === '工作專案' ? 'red' : 'blue';
+    const badgeHtml = p.badge ? `<span class="card-badge card-badge--${badgeColor}">${p.badge}</span>` : '';
+
+    card.innerHTML = `
+      <div class="card-left">
+        ${imgHtml}
+      </div>
+      <div class="card-right">
+        <div class="card-title">${p.title}${badgeHtml}</div>
+        <div class="card-desc">${p.desc}</div>
+        ${linkHtml}
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  function applyDesktopHeaderLayout() {
+    const details = document.querySelector('.header-details');
+    const d1 = details.querySelectorAll('.header-divider')[0];
+    const d2 = details.querySelectorAll('.header-divider')[1];
+    if (d1 && d2) {
+      const dr = details.getBoundingClientRect();
+      const gap = d2.getBoundingClientRect().left - d1.getBoundingClientRect().right;
+      const dpr = window.devicePixelRatio || 1;
+      const d2Right = d2.getBoundingClientRect().right - dr.left;
+      const raw = d2Right + gap;
+      const left = Math.round(raw * dpr) / dpr;
+      details.style.setProperty('--d3-left', left + 'px');
+
+      const skills = details.querySelector('.header-skills');
+      if (skills) {
+        const midX = Math.round((d2Right + gap / 2) * dpr) / dpr;
+        skills.style.left = midX + 'px';
+      }
+
+      const btn = details.querySelector('#view-toggle');
+      if (btn) {
+        btn.style.left = (left + 84) + 'px';
+      }
+    }
+  }
+
+  function clearMobileInlineStyles() {
+    const btn = document.getElementById('view-toggle');
+    if (btn) { btn.style.left = ''; btn.style.top = ''; }
+    const skills = document.querySelector('.header-skills');
+    if (skills) skills.style.left = '';
+    const details = document.querySelector('.header-details');
+    if (details) details.style.removeProperty('--d3-left');
+  }
+
+  window.addEventListener('load', () => {
+    if (window.innerWidth >= 1280) {
+      applyDesktopHeaderLayout();
+
+      const avatar = document.querySelector('.header-avatar');
+      const pv = document.getElementById('portfolio-view');
+      const filterBar = document.getElementById('filter-bar');
+      if (avatar && pv && filterBar) {
+        const avatarRect = avatar.getBoundingClientRect();
+        const pvRect = pv.getBoundingClientRect();
+        filterBar.style.left = (avatarRect.left - pvRect.left) + 'px';
+      }
+    }
+  });
+
+  function repositionFilterBar() {
+    const avatar = document.querySelector('.header-avatar');
+    const pv = document.getElementById('portfolio-view');
+    const filterBar = document.getElementById('filter-bar');
+    if (avatar && pv && filterBar && getComputedStyle(filterBar).position === 'absolute') {
+      const avatarRect = avatar.getBoundingClientRect();
+      const pvRect = pv.getBoundingClientRect();
+      filterBar.style.left = (avatarRect.left - pvRect.left) + 'px';
+    }
+  }
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth < 1280) {
+      clearMobileInlineStyles();
+    } else {
+      applyDesktopHeaderLayout();
+      repositionFilterBar();
+    }
+  });
+
+  const filterTrigger = document.getElementById('filter-trigger');
+  const filterMenu = document.getElementById('filter-menu');
+  filterTrigger.addEventListener('click', e => { e.stopPropagation(); filterMenu.classList.toggle('open'); });
+  document.addEventListener('click', () => filterMenu.classList.remove('open'));
+  document.querySelectorAll('.filter-option').forEach(opt => {
+    opt.addEventListener('click', function(e) {
+      e.stopPropagation();
+      document.querySelectorAll('.filter-option').forEach(o => o.classList.remove('active'));
+      this.classList.add('active');
+      document.getElementById('filter-label').textContent = this.textContent;
+      filterMenu.classList.remove('open');
+      const filter = this.dataset.filter;
+      document.querySelectorAll('#projects-grid .card').forEach(card => {
+        if (filter === 'all') {
+          card.style.display = '';
+        } else {
+          const badge = card.querySelector('.card-badge');
+          card.style.display = (badge && badge.textContent.trim() === filter) ? '' : 'none';
+        }
+      });
+      requestAnimationFrame(repositionFilterBar);
+    });
+  });
+
+  document.addEventListener('contextmenu', e => { if (e.target.tagName === 'IMG') e.preventDefault(); });
+  document.addEventListener('dragstart', e => { if (e.target.tagName === 'IMG') e.preventDefault(); });
+
+  document.getElementById('view-toggle').addEventListener('click', function() {
+    const goToBio = this.textContent.trim() === '查看自傳';
+    document.getElementById('portfolio-view').style.display = goToBio ? 'none' : '';
+    document.getElementById('bio-view').style.display = goToBio ? '' : 'none';
+    this.textContent = goToBio ? '查看作品集' : '查看自傳';
+  });
+</script>
+
+</body>
+</html>
