@@ -190,7 +190,7 @@
       border-radius: 8px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.08);
       padding: 5px;
-      z-index: 100;
+      z-index: 1000;
       min-width: 120px;
     }
     .filter-menu.open { display: block; }
@@ -728,8 +728,8 @@
 
   const filterTrigger = document.getElementById('filter-trigger');
   const filterMenu = document.getElementById('filter-menu');
-  filterTrigger.addEventListener('click', e => { e.stopPropagation(); filterMenu.classList.toggle('open'); });
-  document.addEventListener('click', () => filterMenu.classList.remove('open'));
+  filterTrigger.addEventListener('click', () => { filterMenu.classList.toggle('open'); });
+  document.addEventListener('click', e => { if (!e.target.closest('#filter-bar')) filterMenu.classList.remove('open'); });
   document.querySelectorAll('.filter-option').forEach(opt => {
     opt.addEventListener('click', function(e) {
       e.stopPropagation();
